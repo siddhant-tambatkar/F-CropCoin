@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Prediction</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#cropForm').on('submit', function(event) {
+                event.preventDefault();  // Prevent the form from submitting via the browser
+
+                $.ajax({
+                    url: '/predict',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        let crops = response.predicted_crops;
+                        let resultHtml = '';
+                        crops.forEach(function(crop) {
+                            let cropName = crop.toLowerCase().replace(' ', '_');
+                            resultHtml += '<div class="result-card">';
+                            resultHtml += '<img src="{{ url_for('static', filename='cropphoto/') }}' + cropName + '.jpg" alt="' + crop + '" class="crop-image">';
+                            resultHtml += '<div>' + crop + '</div>';
+                            resultHtml += '</div>';
+                        });
+                        $('#results').html(resultHtml);
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Error: " + xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        <h1>Crop Prediction System</h1>
+    </header>
+    <div class="container">
+        <div class="form-container">
+            <h2>Enter Crop Prediction Data</h2>
+            <div class="card">
+                <form id="cropForm">
+                    <label for="city">City:</label><br>
+                    <input type="text" id="city" name="city"><br>
+                    <label for="ph">Soil pH:</label><br>
+                    <input type="text" id="ph" name="ph"><br>
+                    <label for="rain">Rainfall:</label><br>
+                    <input type="text" id="rain" name="rain"><br><br>
+                    <input type="submit" value="Predict" class="button">
+                </form>
+            </div>
+        </div>
+        <div id="results" class="results-container grid-container">
+            <!-- Result cards will be dynamically added here -->
+        </div>
+    </div>
+</body>
+</html>

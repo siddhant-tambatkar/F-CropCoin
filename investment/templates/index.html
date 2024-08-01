@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Recommendation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .navbar {
+            background-color: #333;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .navbar li {
+            margin: 0 15px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        .navbar a:hover {
+            color: #4CAF50;
+        }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1000px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+        .explanation, form {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .explanation:hover, form:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .explanation {
+            flex: 1;
+            margin-right: 40px;
+        }
+        form {
+            flex: 2;
+        }
+        h1, h2 {
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin-bottom: 8px;
+        }
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            outline: none;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.1s;
+            width: 100%;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        input[type="submit"]:active {
+            transform: translateY(1px);
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-right: 10px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        #translateLabel {
+            vertical-align: super;
+            font-weight: bold;
+            color: #333;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .explanation {
+                margin-right: 0;
+                margin-bottom: 30px;
+            }
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            
+        }
+        
+        .logo {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        <h1>Plan Your Investments</h1>
+    </header>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="explanation">
+                <h2>Investment Guide</h2>
+                <p><strong>Amount to Invest:</strong> Enter the amount of money you wish to invest.</p>
+                <p><strong>Number of Years:</strong> Enter the number of years you plan to invest for.</p>
+                <p><strong>Risk Tolerance:</strong> Choose your risk tolerance level: High, Medium, or Low.</p>
+                <p><strong>Financial Goal:</strong> Select your financial goal: Growth, Income, or Stability.</p>
+                <p><strong>Age:</strong> Enter your current age.</p>
+                <p><strong>Current Savings:</strong> Enter the amount of money you currently have saved.</p>
+            </div>
+
+            <form method="POST" action="/">
+                <h1>Investment Recommendation</h1>
+                <label for="amount">Amount to Invest:</label>
+                <input type="number" id="amount" name="amount" required aria-label="Amount to Invest">
+                
+                <label for="years">Number of Years:</label>
+                <input type="number" id="years" name="years" required aria-label="Number of Years">
+                
+                <label for="risk_tolerance">Risk Tolerance:</label>
+                <select id="risk_tolerance" name="risk_tolerance" required aria-label="Risk Tolerance">
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+                
+                <label for="financial_goal">Financial Goal:</label>
+                <select id="financial_goal" name="financial_goal" required aria-label="Financial Goal">
+                    <option value="growth">Growth</option>
+                    <option value="income">Income</option>
+                    <option value="stability">Stability</option>
+                </select>
+                
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" required aria-label="Age">
+                
+                <label for="current_savings">Current Savings:</label>
+                <input type="number" id="current_savings" name="current_savings" required aria-label="Current Savings">
+                
+                <input type="submit" value="Get Recommendation">
+            </form>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <label class="switch">
+                <input type="checkbox" id="translate" onclick="toggleTranslation()">
+                <span class="slider"></span>
+            </label>
+            <span id="translateLabel">Translate to Marathi</span>
+        </div>
+        <div id="loading" class="loading">Translating...</div>
+    </div>
+
+    <script>
+        let isMarathi = false;
+        const elementsToTranslate = document.querySelectorAll('h1, h2, label, option, input[type="submit"], p, strong');
+        const originalTexts = new Map();
+
+        // Check language preference on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedLanguage = localStorage.getItem('language');
+            if (savedLanguage === 'marathi') {
+                isMarathi = true;
+                document.getElementById('translate').checked = true;
+                translatePage();
+            }
+        });
+
+        function toggleTranslation() {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            if (isMarathi) {
+                restoreOriginalText();
+                document.getElementById('translateLabel').textContent = 'Translate to Marathi';
+                localStorage.setItem('language', 'english');
+                loading.style.display = 'none';
+                isMarathi = false;
+            } else {
+                translatePage();
+            }
+        }
+
+        async function translatePage() {
+            const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=mr&dt=t&q=';
+
+            for (let element of elementsToTranslate) {
+                const text = element.innerText || element.value;
+                if (!originalTexts.has(element)) {
+                    originalTexts.set(element, text);
+                }
+
+                try {
+                    const response = await fetch(url + encodeURIComponent(text));
+                    const data = await response.json();
+                    const translatedText = data[0].map(item => item[0]).join('');
+
+                    if (element.innerText) {
+                        element.innerText = translatedText;
+                    } else if (element.value) {
+                        element.value = translatedText;
+                    }
+                } catch (error) {
+                    console.error('Translation error:', error);
+                }
+            }
+
+            document.getElementById('translateLabel').textContent = 'Translate to English';
+            document.getElementById('loading').style.display = 'none';
+            localStorage.setItem('language', 'marathi');
+            isMarathi = true;
+        }
+
+        function restoreOriginalText() {
+            for (let [element, originalText] of originalTexts) {
+                if (element.innerText) {
+                    element.innerText = originalText;
+                } else if (element.value) {
+                    element.value = originalText;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
