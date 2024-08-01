@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .result {
+            background: #f4f4f4;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #38a;
+            border-radius: 4px;
+        }
+        .result p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .result p:first-child {
+            margin-top: 0;
+        }
+        a {
+            color: #38a;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: #1c6a98;
+        }
+
+        /* Translation toggle styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        #translateLabel {
+            margin-left: 10px;
+            vertical-align: super;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Investment Results</h2>
+
+        <div class="result">
+            <p>Amount Invested in Mutual Fund: ₹{{ mf_amount|float|round(2) }}</p>
+            <p>Amount Invested in Government Scheme: ₹{{ gs_amount|float|round(2) }}</p>
+            <p>Emergency Fund Amount: ₹{{ emergency_fund_amount|float|round(2) }}</p>
+            <p>Total Withdrawable Amount after {{ years }} years: ₹{{ total_returns|float|round(2) }}</p>
+        </div>
+
+        <p style="text-align: center;"><a href="/">Go back</a></p>
+
+        <!-- Add translation toggle -->
+        <div style="text-align: center; margin-top: 20px;">
+            <label class="switch">
+                <input type="checkbox" id="translate" onclick="toggleTranslation()">
+                <span class="slider"></span>
+            </label>
+            <span id="translateLabel">Translate to Marathi</span>
+        </div>
+        <div id="loading" class="loading">Translating...</div>
+    </div>
+
+    <script>
+        let isMarathi = false;
+        const elementsToTranslate = document.querySelectorAll('h2, p, a');
+        const originalTexts = new Map();
+
+        // Check language preference on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedLanguage = localStorage.getItem('language');
+            if (savedLanguage === 'marathi') {
+                isMarathi = true;
+                document.getElementById('translate').checked = true;
+                translatePage();
+            }
+        });
+
+        function toggleTranslation() {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            if (isMarathi) {
+                restoreOriginalText();
+                document.getElementById('translateLabel').textContent = 'Translate to Marathi';
+                localStorage.setItem('language', 'english');
+                loading.style.display = 'none';
+                isMarathi = false;
+            } else {
+                translatePage();
+            }
+        }
+
+        async function translatePage() {
+            const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=mr&dt=t&q=';
+
+            for (let element of elementsToTranslate) {
+                const text = element.innerText;
+                if (!originalTexts.has(element)) {
+                    originalTexts.set(element, text);
+                }
+
+                try {
+                    const response = await fetch(url + encodeURIComponent(text));
+                    const data = await response.json();
+                    const translatedText = data[0].map(item => item[0]).join('');
+                    element.innerText = translatedText;
+                } catch (error) {
+                    console.error('Translation error:', error);
+                }
+            }
+
+            document.getElementById('translateLabel').textContent = 'Translate to English';
+            document.getElementById('loading').style.display = 'none';
+            localStorage.setItem('language', 'marathi');
+            isMarathi = true;
+        }
+
+        function restoreOriginalText() {
+            for (let [element, originalText] of originalTexts) {
+                element.innerText = originalText;
+            }
+        }
+    </script>
+</body>
+</html>
