@@ -193,16 +193,18 @@ def TopFiveWinners():
         prev_predict = i.getPredictedValue([float(prev_month), current_year, prev_rainfall])
         prev_month_prediction.append(prev_predict)
         change.append((((current_predict - prev_predict) * 100 / prev_predict), commodity_list.index(i)))
-    sorted_change = change
-    sorted_change.sort(reverse=True)
-    # print(sorted_change)
+
+    sorted_change = sorted(change, reverse=True)
     to_send = []
-    for j in range(0, 5):
+
+    # Adjust the loop to iterate only over the number of available items
+    for j in range(min(5, len(sorted_change))):
         perc, i = sorted_change[j]
         name = commodity_list[i].getCropName().split('/')[1]
         to_send.append([name, round((current_month_prediction[i] * base[name]) / 100, 2), round(perc, 2)])
-    #print(to_send)
+
     return to_send
+
 
 
 def TopFiveLosers():
